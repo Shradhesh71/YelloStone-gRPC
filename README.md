@@ -1,4 +1,4 @@
-# YelloStone-gRPC-Solana-Indexer
+# YellowStone-gRPC-Solana-Indexer
 
 🚀 **An advanced, production-ready blockchain indexer for Solana** with real-time multi-token tracking, intelligent alerting, and comprehensive performance monitoring. Built with TypeScript and designed for enterprise-scale blockchain data processing.
 
@@ -33,8 +33,8 @@ This project connects to Yellowstone gRPC streams and provides real-time Solana 
 
 ### 1. **Clone and Install**
 ```bash
-git clone https://github.com/Shradhesh71/YelloStone-gRPC.git
-cd YelloStone-gRPC
+git clone https://github.com/Shradhesh71/YellowStone-gRPC.git
+cd YellowStone-gRPC
 npm install
 ```
 
@@ -164,8 +164,8 @@ We welcome contributions! Please:
 
 **Maintained by [@Shradhesh71](https://github.com/Shradhesh71)**
 
-🐛 **Found a bug?** [Open an issue](https://github.com/Shradhesh71/YelloStone-gRPC-Solana-indexer/issues)  
-💡 **Feature request?** [Start a discussion](https://github.com/Shradhesh71/YelloStone-gRPC-Solana-indexer/discussions)  
+🐛 **Found a bug?** [Open an issue](https://github.com/Shradhesh71/YellowStone-gRPC-Solana-indexer/issues)  
+💡 **Feature request?** [Start a discussion](https://github.com/Shradhesh71/YellowStone-gRPC-Solana-indexer/discussions)  
 📧 **Need help?** Check our documentation or open an issue
 
 ---
