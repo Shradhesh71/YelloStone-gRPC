@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id         Int     @id @default(autoincrement())
+  pubkey     Bytes?  
+  owner      Bytes?
+  lamports   String?
+  executable Boolean?
+  rentEpoch  String?
+  slot       String
+  dataLength Int
+  tokenMint  String? 
+  tokenSymbol String? 
+  createdAt  DateTime @default(now())
+  
+  @@index([slot])
+  @@index([owner])
+  @@index([tokenMint])
+  @@index([tokenSymbol])
+}
+
+model Transaction {
+  id        Int     @id @default(autoincrement())
+  signature Bytes? @unique
+  slot      String
+  success   Boolean
+  amount    String? 
+  createdAt DateTime @default(now())
+  
+  @@index([slot])
+  @@index([success])
+}
+
+model SlotUpdate {
+  id        Int      @id @default(autoincrement())
+  slot      String?   @unique
+  parent    String?
+  createdAt DateTime @default(now())
+  
+  @@index([slot])
+}
+
+
+model BlockUpdate {
+  id                     Int      @id @default(autoincrement())
+  blockhash              String?   @unique
+  blockHeight            String?
+  blockTime              DateTime?
+  parentSlot             String?
+  parentBlockhash        String
+  executedTransactions   String
+  updatedAccounts        String
+  entries                String
+  createdAt              DateTime @default(now())
+  
+  @@index([blockHeight])
+  @@index([parentSlot])
+}
+
