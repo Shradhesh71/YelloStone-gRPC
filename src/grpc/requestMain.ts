@@ -15,27 +15,29 @@ export function createSubscribeRequest(): SubscribeRequest {
     slots: {
       "slot_updates": {
         filterByCommitment: true,
-        interslotUpdates: false // Set to false to reduce noise
+        interslotUpdates: false // Reduce noise
       }
     },
     transactions: {
-      "all_transactions": {
-        accountInclude: tokenMints,
+      // Only track transactions that REQUIRE our tokens (more restrictive)
+      "whale_transactions": {
+        accountInclude: [],
         accountExclude: [],
-        accountRequired: [],
-        vote: false, // Exclude vote transactions
-        failed: false, // Exclude failed transactions
+        accountRequired: tokenMints, // This makes it more restrictive
+        vote: false,
+        failed: false,
       }
     },
     transactionsStatus: {},
     entry: {},
     blocks: {
-      "relevant_blocks": {
-        accountInclude: tokenMints,
-        includeTransactions: true,
-        includeAccounts: false,
-        includeEntries: false
-      }
+      // "relevant_blocks": {
+      //   accountInclude: tokenMints,
+      //   includeTransactions: true,
+      //   includeAccounts: false,
+      //   includeEntries: false
+      // }
+      // Remove blocks to reduce data volume
     },
     blocksMeta: {},
     commitment: CommitmentLevel.CONFIRMED,

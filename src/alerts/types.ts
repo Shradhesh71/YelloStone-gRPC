@@ -57,9 +57,18 @@ export class AlertFormatter {
             inline: true
           },
           {
-            name: "🔗 Signature",
+            name: "🔗 Transaction",
             value: alert.transactionSignature ? 
-              `[View on Explorer](https://explorer.solana.com/tx/${alert.transactionSignature})` : 
+              (alert.transactionSignature.startsWith('ACC_') ? 
+                `Account Ref: \`${alert.transactionSignature}\`` :
+                `[View on Explorer](https://explorer.solana.com/tx/${alert.transactionSignature})`) : 
+              "N/A",
+            inline: false
+          },
+          {
+            name: "📍 Account",
+            value: alert.accountAddress ? 
+              `[View Account](https://explorer.solana.com/address/${alert.accountAddress})` : 
               "N/A",
             inline: false
           }
@@ -75,17 +84,28 @@ export class AlertFormatter {
   static formatTelegramMessage(alert: AlertData): string {
     const emoji = this.getEmojiForToken(alert.token.symbol);
     
-    return `🚨 *${alert.type.replace('_', ' ').toUpperCase()} ALERT*
+    let transactionInfo = '';
+    if (alert.transactionSignature) {
+      if (alert.transactionSignature.startsWith('ACC_')) {
+        transactionInfo = `� *Account Ref:* \`${alert.transactionSignature}\``;
+      } else {
+        transactionInfo = `🔗 [View Transaction](https://explorer.solana.com/tx/${alert.transactionSignature})`;
+      }
+    }
     
-    ${emoji} *Token:* ${alert.token.symbol} (${alert.token.name})
-    💰 *Amount:* ${alert.formattedAmount}
-    ⏰ *Time:* ${alert.timestamp.toLocaleString()}
-    🔗 *Slot:* ${alert.slot}
-
-    ${alert.transactionSignature ? 
-    `[View Transaction](https://explorer.solana.com/tx/${alert.transactionSignature})` : 
-    ''
-    }`;
+    let accountInfo = '';
+    if (alert.accountAddress) {
+      accountInfo = `📍 [View Account](https://explorer.solana.com/address/${alert.accountAddress})`;
+    }
+    
+    return `�🚨 *${alert.type.replace('_', ' ').toUpperCase()} ALERT*
+    
+        ${emoji} *Token:* ${alert.token.symbol} (${alert.token.name})
+        💰 *Amount:* ${alert.formattedAmount}
+        ⏰ *Time:* ${alert.timestamp.toLocaleString()}
+        🏷️ *Slot:* ${alert.slot}
+        ${transactionInfo}
+        ${accountInfo}`;
   }
 
   private static getEmojiForToken(symbol: string): string {

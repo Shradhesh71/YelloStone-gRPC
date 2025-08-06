@@ -80,8 +80,8 @@ export class PerformanceMonitor {
   // Record database operation
   recordDatabaseOperation(latency: number, success: boolean = true): void {
     if (success) {
-      this.updateAverageDatabaseLatency(latency);
       this.metrics.databaseOperationsPerSecond++;
+      this.updateAverageDatabaseLatency(latency);
     } else {
       this.metrics.failedDatabaseOperations++;
     }
@@ -250,16 +250,30 @@ export class PerformanceMonitor {
 
   // Helper methods
   private updateAverageProcessingTime(duration: number): void {
+    if (this.metrics.totalMessagesProcessed <= 0) {
+      this.metrics.averageProcessingTime = duration;
+      return;
+    }
+    
     const total = this.metrics.averageProcessingTime * (this.metrics.totalMessagesProcessed - 1) + duration;
     this.metrics.averageProcessingTime = total / this.metrics.totalMessagesProcessed;
   }
 
   private updateMessagesPerSecond(): void {
     const uptimeSeconds = (Date.now() - this.startTime) / 1000;
+    if (uptimeSeconds <= 0) {
+      this.metrics.messagesPerSecond = 0;
+      return;
+    }
     this.metrics.messagesPerSecond = this.metrics.totalMessagesProcessed / uptimeSeconds;
   }
 
   private updateAverageDatabaseLatency(latency: number): void {
+    if (this.metrics.databaseOperationsPerSecond <= 0) {
+      this.metrics.databaseLatency = latency;
+      return;
+    }
+    
     const total = this.metrics.databaseLatency * (this.metrics.databaseOperationsPerSecond - 1) + latency;
     this.metrics.databaseLatency = total / this.metrics.databaseOperationsPerSecond;
   }
@@ -268,7 +282,7 @@ export class PerformanceMonitor {
   private startPeriodicReporting(): void {
     this.intervalId = setInterval(() => {
       this.printPerformanceReport();
-    }, 60000); // Report every minute
+    }, 60000); // Report every 60 seconds
   }
 
   printPerformanceReport(): void {
@@ -291,10 +305,13 @@ export class PerformanceMonitor {
     
     // Performance metrics
     console.log(`\n${chalk.cyan("⚡ Performance:")}`);
-    console.log(`   Messages/sec: ${metrics.messagesPerSecond.toFixed(2)}`);
-    console.log(`   Avg processing: ${metrics.averageProcessingTime.toFixed(2)}ms`);
-    console.log(`   DB latency: ${metrics.databaseLatency.toFixed(2)}ms`);
+    console.log(`   Messages/sec: ${isNaN(metrics.messagesPerSecond) ? '0.00' : metrics.messagesPerSecond.toFixed(2)}`);
+    console.log(`   Avg processing: ${isNaN(metrics.averageProcessingTime) ? '0.00' : metrics.averageProcessingTime.toFixed(2)}ms`);
+    console.log(`   DB latency: ${isNaN(metrics.databaseLatency) ? '0.00' : metrics.databaseLatency.toFixed(2)}ms`);
     console.log(`   Memory: ${Math.round(metrics.memoryUsage.heapUsed / 1024 / 1024)}MB`);
+    console.log(`   Total messages: ${metrics.totalMessagesProcessed}`);
+    console.log(`   DB operations: ${metrics.databaseOperationsPerSecond}`);
+    console.log(`   Alerts sent: ${metrics.alertsSent}`);
     
     // Token activity
     console.log(`\n${chalk.cyan("🪙 Token Activity:")}`);

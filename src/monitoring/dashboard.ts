@@ -23,7 +23,7 @@ export class PerformanceDashboard {
       return "Performance monitoring not initialized";
     }
 
-    const uptimeHours = (metrics.connectionUptime / (1000 * 60 * 60)).toFixed(2);
+    const uptimeMinutes = (metrics.connectionUptime / (1000 * 15)).toFixed(2);
     const memoryMB = Math.round(metrics.memoryUsage.heapUsed / 1024 / 1024);
     
     return `
@@ -35,7 +35,7 @@ export class PerformanceDashboard {
         ⏱️  Avg Processing: ${metrics.averageProcessingTime.toFixed(2)}ms
         💾 Database Latency: ${metrics.databaseLatency.toFixed(2)}ms
         🧠 Memory Usage: ${memoryMB}MB
-        📡 Uptime: ${uptimeHours} hours
+        📡 Uptime: ${uptimeMinutes} minutes
         📨 Total Messages: ${metrics.totalMessagesProcessed}
         🚨 Alerts Sent: ${metrics.alertsSent}
         ❌ Stream Errors: ${metrics.streamErrors}
@@ -85,10 +85,10 @@ ${timestamp},${metrics.messagesPerSecond},${metrics.totalMessagesProcessed},${me
   private static calculateActivityRate(tokenMetric: any): number {
     const now = new Date();
     const lastActivity = new Date(tokenMetric.lastActivity);
-    const hoursSinceLastActivity = (now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60);
-    
-    if (hoursSinceLastActivity === 0) return 0;
-    return tokenMetric.transactions / hoursSinceLastActivity;
+    const minutesSinceLastActivity = (now.getTime() - lastActivity.getTime()) / (1000 * 15);
+
+    if (minutesSinceLastActivity === 0) return 0;
+    return tokenMetric.transactions / minutesSinceLastActivity;
   }
 
   // Get performance summary for alerting
@@ -120,7 +120,7 @@ ${timestamp},${metrics.messagesPerSecond},${metrics.totalMessagesProcessed},${me
         messagesPerSecond: metrics.messagesPerSecond,
         databaseLatency: metrics.databaseLatency,
         memoryUsageMB: Math.round(metrics.memoryUsage.heapUsed / 1024 / 1024),
-        uptime: Math.round(metrics.connectionUptime / (1000 * 60 * 60)), // hours
+        uptime: Math.round(metrics.connectionUptime / (1000 * 15)), // minutes
         totalMessages: metrics.totalMessagesProcessed
       }
     };

@@ -80,8 +80,8 @@ async function handleAccountUpdate(data: SubscribeUpdate): Promise<void> {
         rentEpoch,
         slot: slot || "0",
         dataLength: dataLen,
-        // tokenMint: token ? dataPubkey.toString() : null,
-        // tokenSymbol: token?.symbol || null
+        tokenMint: token ? dataPubkey.toString() : null,
+        tokenSymbol: token?.symbol || null
       }
     });
 
@@ -108,7 +108,7 @@ async function handleAccountUpdate(data: SubscribeUpdate): Promise<void> {
           formattedAmount: `${formattedAmount.toLocaleString()} ${token.symbol}`,
           accountAddress: dataPubkey.toString(),
           timestamp: new Date(),
-          slot: slot || "0"
+          slot: slot || "0",
         });
       }
     }
@@ -133,6 +133,7 @@ async function handleTransactionUpdate(data: SubscribeUpdate): Promise<void> {
     const sig = txnInfo.signature;
     const slot = data.transaction?.slot;
     const success = txnInfo.meta?.err === null;
+    const signatureBase64 = sig ? Buffer.from(sig).toString('base64') : null;
 
     await client.transaction.create({
       data: {
@@ -147,7 +148,7 @@ async function handleTransactionUpdate(data: SubscribeUpdate): Promise<void> {
     monitor?.recordDatabaseOperation(dbDuration, true);
 
     console.log(chalk.magenta(`🔁 Transaction:`), 
-      sig ? Buffer.from(sig).toString('base64').slice(0, 20) + '...' : 'Unknown',
+      signatureBase64 ? signatureBase64.slice(0, 20) + '...' : 'Unknown',
       success ? chalk.green('✅') : chalk.red('❌')
     );
   } catch (error) {
@@ -236,6 +237,7 @@ async function sendAlert(alertData: AlertData): Promise<void> {
     if (alertSender) {
       await alertSender.sendAlert(alertData);
       monitor?.recordAlertSent(true);
+      console.log(chalk.green(`✅ Alert sent for ${alertData.token.symbol} transaction`));
     }
   } catch (error) {
     monitor?.recordAlertSent(false);
